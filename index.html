@@ -486,15 +486,17 @@ function parseRows(data) {
       incidentTypes: String(cell(1) || '').split(',').map(s => s.trim()).filter(Boolean),
       incidentDate:  dateCell(2),
       incidentTime:  String(cell(3) || '').trim(),
-      location:      String(cell(4) || '').trim(),
-      description:   String(cell(5) || '').trim(),
-      make:          String(cell(6) || '').trim(),
-      model:         String(cell(7) || '').trim(),
-      colour:        String(cell(8) || '').trim(),
-      licensePlate:  String(cell(9) || '').trim(),
-      photos:        parsePhotos(String(c[10]?.v || '')),
-      videoLink:     String(cell(11) || '').trim(),
-      submittedBy:   String(cell(12) || '').trim() || 'Anonymous',
+      location:      String(cell(4) || '').trim(),   // E
+      description:   String(cell(5) || '').trim(),   // F
+      photos:        parsePhotos(String(c[6]?.v || '')), // G
+      videoLink:     String(cell(7) || '').trim(),   // H
+      submittedBy:   String(cell(8) || '').trim() || 'Anonymous', // I
+      // J=Your address, K=Email Address — not displayed
+      vehicleColour: String(cell(11) || '').trim(),  // L
+      make:          String(cell(12) || '').trim(),  // M
+      model:         String(cell(13) || '').trim(),  // N
+      colour:        String(cell(14) || '').trim(),  // O
+      licensePlate:  String(cell(15) || '').trim(),  // P
     };
   }).filter(r => r.incidentTypes.length);
 }
@@ -519,9 +521,9 @@ function renderCard(inc) {
   const isAnon = inc.submittedBy === 'Anonymous';
 
   const vehicleFields = [
+    { label: 'Colour',  value: inc.vehicleColour || inc.colour },
     { label: 'Make',    value: inc.make },
     { label: 'Model',   value: inc.model },
-    { label: 'Colour',  value: inc.colour },
     { label: 'Plate',   value: inc.licensePlate },
   ].filter(f => f.value);
   const vehicleHtml = vehicleFields.length ? `
@@ -582,10 +584,11 @@ function renderRecurringVehicles(incidents) {
   const counts = {};
   const display = {};
   incidents.forEach(i => {
-    if (!i.colour || !i.make) return;
-    const key = `${i.colour.toLowerCase()}|${i.make.toLowerCase()}`;
+    const col = i.vehicleColour || i.colour;
+    if (!col || !i.make) return;
+    const key = `${col.toLowerCase()}|${i.make.toLowerCase()}`;
     counts[key] = (counts[key] || 0) + 1;
-    display[key] = `${i.colour} ${i.make}`;
+    display[key] = `${col} ${i.make}`;
   });
 
   const recurring = Object.entries(counts)
